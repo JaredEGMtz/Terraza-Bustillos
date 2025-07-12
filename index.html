@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página Inicial</title>
+  <!--Libreria FontAwesome-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">Terraza Bustillos</div>
+      <div class="menu-icon">
+      <i class="fas fa-bars"></i> <!-- icono hamburguesa -->
+    </div>
+      <ul class="menu">
+        <li><a href="#logo">Inicio</a></li>
+        <li><a href="#separador">Servicios</a></li>
+        <li><a href="#">Reservas</a></li>
+        <li><a href="#">Contacto</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Terraza Bustillos</h1>
+    <p>Ofrecemos los mejores servicios para ti.</p>
+    <a href="#" class="btn">Conócenos</a>
+  </section>
+
+  <div id="separador">
+    Servicios
+  </div>
+
+  <section class="servicios">
+    <h2>Servicios</h2>
+  </section>
+
+  <section class="Reservas">
+    <h2>Reservas</h2>
+    <form action="reservar.php" method="POST">
+        <label for="personas">¿Cuántas personas?</label>
+        <input type="number" id="personas" name="personas" min="1" max="50" required>
+
+        <label for="fecha">¿Qué día?</label>
+        <input type="date" id="fecha" name="fecha" required>
+
+        <label for="hora_inicio">Desde:</label>
+        <input type="time" id="hora_inicio" name="hora_inicio" required>
+
+        <label for="hora_fin">Hasta:</label>
+        <input type="time" id="hora_fin" name="hora_fin" required>
+
+        <button type="submit">Reservar</button>
+    </form>
+
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>

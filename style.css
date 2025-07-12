@@ -1,0 +1,174 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #464242;
+}
+
+header {
+  background-color: rgba(0, 0, 0, 0.6); /* Fondo negro con 60% de opacidad */
+  padding: 15px 30px;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.menu {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+}
+
+.menu li a {
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.menu li a:hover {
+  color: #18bc9c;
+}
+
+/* Oculta el icono del menú hamburguesa por defecto */
+.menu-icon {
+  display: none;
+  font-size: 28px;
+  color: #18bc9c;
+  cursor: pointer;
+}
+
+/* Estilos responsive para pantallas menores a 768px */
+@media (max-width: 768px) {
+  .menu {
+    display: none; /* Oculta el menú */
+    flex-direction: column;
+    position: fixed;
+    top: 60px;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    width: 200px;
+    height: calc(100vh - 60px);
+    padding-top: 1rem;
+    gap: 20px;
+    z-index: 20;
+  }
+  .menu.show {
+    display: flex; /* Muestra el menú cuando tenga clase show */
+  }
+  .menu-icon {
+    display: block; /* Muestra el icono hamburguesa */
+  }
+}
+
+.hero {
+  height: 100vh;
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(44, 40, 40, 0.3)), url('assets/terraza.jpg') no-repeat center center/cover;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0 20px;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  animation: backgroundShift 20s ease-in-out infinite alternate;
+  filter: brightness(0.4);
+}
+
+@keyframes backgroundShift {
+  0% {
+    background-position: center top;
+  }
+  100% {
+    background-position: center bottom;
+  }
+}
+
+.hero h1 {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.btn {
+  background-color: #000000;
+  color: white;
+  padding: 12px 24px;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.btn:hover {
+  background-color: #14947f;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 60px 20px;
+    height: 100dvh;
+    background-size: cover;
+    background-position: center center;
+    animation: backgroundShift 20s ease-in-out infinite alternate;
+    filter: brightness(0.6);
+  }
+
+  .hero h1 {
+    font-size: 32px;
+  }
+
+  .hero p {
+    font-size: 16px;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+#separador{
+    height: 50px;
+    background-color: #000000;
+}
+
+.servicios{
+    background-color: #ffffff;
+    height: 350px;
+    margin-left: 50%;
+    text-align: center;
+}
+
+.Reservas{
+    background-color: #ffffff;
+    height: 350px;
+
+    text-align: center;
+}
