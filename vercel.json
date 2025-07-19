@@ -1,0 +1,17 @@
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "build": {
+    "env": {
+      "VITE_PUBLIC_FIREBASE_API_KEY": "@vite_public_firebase_api_key",
+      "VITE_PUBLIC_FIREBASE_AUTH_DOMAIN": "@vite_public_firebase_auth_domain",
+      "VITE_PUBLIC_FIREBASE_PROJECT_ID": "@vite_public_firebase_project_id",
+      "VITE_PUBLIC_FIREBASE_STORAGE_BUCKET": "@vite_public_firebase_storage_bucket",
+      "VITE_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "@vite_public_firebase_messaging_sender_id",
+      "VITE_PUBLIC_FIREBASE_APP_ID": "@vite_public_firebase_app_id",
+      "VITE_PUBLIC_FIREBASE_MEASUREMENT_ID": "@vite_public_firebase_measurement_id"
+    }
+  },
+  "outputDirectory": "public"
+}
