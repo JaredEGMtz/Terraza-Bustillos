@@ -17,7 +17,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.0.0/firebas
 import {
     getAuth,
     signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
+    createUserWithEmailAndPassword, // Se mantiene por si se necesita para registro temporal
     signOut,
     onAuthStateChanged
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js';
@@ -33,7 +33,7 @@ let isAdmin = false; // Bandera para determinar si el usuario actual es un admin
 // 2. Inicia sesión con esa cuenta.
 // 3. Abre la consola del navegador (F12) y busca el mensaje "User ID: [TU_UID_AQUI]".
 // 4. Pega ese UID aquí.
-const ADMIN_UID = "Zj4oJLAsW0SFoPhR0Sca0aq1HUQ2"; // Ejemplo: "abcdef1234567890abcdef1234567890"
+const ADMIN_UID = "Zj4oJLAsW0SFoPhR0Sca0aq1HUQ2"; // UID del administrador agregado aquí
 
 document.addEventListener('DOMContentLoaded', async () => {
     // Inicializar Firebase
@@ -41,9 +41,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
         auth = getAuth(app);
-
-        // Ya no iniciamos sesión anónimamente por defecto.
-        // La autenticación se manejará a través del formulario de inicio de sesión.
 
     } catch (error) {
         console.error("Error al inicializar Firebase:", error);
@@ -95,9 +92,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (loginForm) loginForm.style.display = 'none'; // Ocultar formulario de login
             if (logoutBtn) logoutBtn.style.display = 'block'; // Mostrar botón de logout
 
-            // Configurar el listener de Firestore solo si hay un usuario autenticado
-            setupUnavailableDatesListener();
-
         } else {
             userId = null;
             isAdmin = false;
@@ -108,10 +102,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (loginForm) loginForm.style.display = 'block'; // Mostrar formulario de login
             if (logoutBtn) logoutBtn.style.display = 'none'; // Ocultar botón de logout
 
-            // Limpiar fechas no disponibles si no hay usuario autenticado
-            unavailableDatesFirestore = [];
-            renderCalendar(); // Re-renderizar para reflejar el estado sin fechas de Firestore
+            // NO LIMPIAMOS unavailableDatesFirestore aquí.
+            // El listener de onSnapshot seguirá trayendo los datos públicos.
         }
+        // Llamar a setupUnavailableDatesListener() siempre, para que las fechas se carguen
+        // sin importar el estado de autenticación.
+        setupUnavailableDatesListener();
     });
 
     // Manejar el envío del formulario de inicio de sesión
@@ -172,8 +168,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Función para configurar el listener en tiempo real para fechas no disponibles
     function setupUnavailableDatesListener() {
-        if (!db || !userId) {
-            console.warn("Firestore no inicializado o usuario no autenticado. No se puede configurar el listener.");
+        if (!db) { // Solo necesitamos que db esté inicializado, no userId para leer datos públicos
+            console.warn("Firestore no inicializado. No se puede configurar el listener de fechas no disponibles.");
             return;
         }
 
@@ -260,8 +256,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Renderizado inicial del calendario (será re-renderizado por onSnapshot más tarde)
-    renderCalendar();
-
+    // No llamamos a renderCalendar aquí directamente, onAuthStateChanged lo hará
+    // después de configurar el listener de Firestore.
 
     // --- Lógica para conectar el calendario con tu input de fecha y la funcionalidad de administrador ---
     const fechaPrincipalInput = document.getElementById('fechaPrincipal');
