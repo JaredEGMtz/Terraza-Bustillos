@@ -28,7 +28,7 @@ let app, db, auth;
 let userId = null;
 let isAdmin = false;
 
-const ADMIN_UID = "Zj4oJLAsW0SFoPhR0Sca0aq1HUQ2"; // Tu UID de administrador
+const ADMIN_UID = "r8iNai6DZ5Wn6MYsZqIyBPHCUcV2"; // Tu UID de administrador
 
 document.addEventListener('DOMContentLoaded', async () => {
     // Inicializar Firebase
