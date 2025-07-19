@@ -6,58 +6,107 @@
   <title>Página Inicial</title>
   <!--Libreria FontAwesome-->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Tailwind CSS CDN (Necesario para el calendario) -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+  <!-- Controles de Firebase y Admin (NUEVO) -->
+  <div class="firebase-status-container">
+    <div id="firebaseStatus" class="text-sm text-gray-600">Inicializando Firebase...</div>
+    <div id="userIdDisplay" class="text-sm text-gray-600 mt-1"></div>
+    <button id="adminToggleBtn" class="mt-2 px-4 py-2 rounded-lg bg-gray-500 text-white text-sm font-semibold shadow-md transition-colors duration-200">
+        Modo Admin: OFF
+    </button>
+  </div>
+
   <header>
     <nav class="navbar">
-      <div class="logo">Terraza Bustillos</div>
+      <a href="#"><div class="logo">Terraza Bustillos</div></a>
       <div class="menu-icon">
-      <i class="fas fa-bars"></i> <!-- icono hamburguesa -->
+      <i class="fas fa-bars"></i> <!--icono hamburguesa-->
+
     </div>
       <ul class="menu">
-        <li><a href="#logo">Inicio</a></li>
+        <li><a href="#" class="active">Inicio</a></li>
         <li><a href="#separador">Servicios</a></li>
         <li><a href="#">Reservas</a></li>
         <li><a href="#">Contacto</a></li>
       </ul>
     </nav>
   </header>
-
   <section class="hero">
-    <h1>Terraza Bustillos</h1>
+    <h1 class="heroo">Terraza Bustillos</h1>
     <p>Ofrecemos los mejores servicios para ti.</p>
     <a href="#" class="btn">Conócenos</a>
   </section>
-
-  <div id="separador">
-    Servicios
-  </div>
 
   <section class="servicios">
     <h2>Servicios</h2>
   </section>
 
-  <section class="Reservas">
+  <section class="Reservas" id="reservas">
     <h2>Reservas</h2>
-    <form action="reservar.php" method="POST">
-        <label for="personas">¿Cuántas personas?</label>
-        <input type="number" id="personas" name="personas" min="1" max="50" required>
 
-        <label for="fecha">¿Qué día?</label>
-        <input type="date" id="fecha" name="fecha" required>
+    <!-- Calendario de Disponibilidad de Terraza -->
+    <div class="calendar-container">
+        <div class="header">
+            <button id="prevMonth">Mes Anterior</button>
+            <div class="month-year" id="monthYear"></div>
+            <button id="nextMonth">Mes Siguiente</button>
+        </div>
+        <div class="weekdays">
+            <div>Dom</div>
+            <div>Lun</div>
+            <div>Mar</div>
+            <div>Mié</div>
+            <div>Jue</div>
+            <div>Vie</div>
+            <div>Sáb</div>
+        </div>
+        <div class="days-grid" id="daysGrid">
+            <!-- Los días se insertarán dinámicamente aquí -->
+        </div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color available"></div>
+                <span>Disponible</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color unavailable"></div>
+                <span>No Disponible</span>
+            </div>
+        </div>
+    </div>
 
-        <label for="hora_inicio">Desde:</label>
-        <input type="time" id="hora_inicio" name="hora_inicio" required>
+    <!-- Tu formulario de reservas existente -->
+    <!-- Nota: El input de fecha nativo se mantiene, pero la interacción principal será con el calendario visual. -->
+    <div class="fecha-container">
+      <label for="fechaPrincipal">Selecciona una fecha:</label>
+      <input type="date" id="fechaPrincipal" name="fechaPrincipal" required>
+    </div>
 
-        <label for="hora_fin">Hasta:</label>
-        <input type="time" id="hora_fin" name="hora_fin" required>
+    <form id="formularioReservas" action="reservar.php" method="POST" style="display: none;">
+      <input type="hidden" id="fecha" name="fecha">
 
-        <button type="submit">Reservar</button>
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" name="nombre" required>
+
+      <label for="personas">¿Cuántas personas?</label>
+      <input type="number" id="personas" name="personas" min="1" max="50" required>
+
+      <label for="hora_inicio">Desde:</label>
+      <input type="time" id="hora_inicio" name="hora_inicio" required>
+
+      <label for="hora_fin">Hasta:</label>
+      <input type="time" id="hora_fin" name="hora_fin" required>
+
+      <button type="submit">Reservar</button>
     </form>
-
   </section>
 
-  <script src="script.js"></script>
+
+  <script type="module" src="script.js"></script>
 </body>
 </html>
