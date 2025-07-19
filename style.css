@@ -39,8 +39,8 @@ html::-webkit-scrollbar-thumb {
     background: white;
 }
 
-/* NUEVO: Estilos para el contenedor de estado de Firebase y el botón de admin */
-.firebase-status-container {
+/* NUEVO: Estilos para el contenedor de estado de autenticación y botones */
+.auth-status-container { /* Renombrado de firebase-status-container */
     position: fixed;
     top: 80px; /* Ajusta según la altura de tu header */
     right: 20px;
@@ -130,7 +130,7 @@ header {
     .menu-icon {
         display: block; /* Muestra el icono hamburguesa */
     }
-    .firebase-status-container {
+    .auth-status-container { /* Renombrado */
         top: 60px; /* Ajusta para pantallas pequeñas */
         right: 10px;
         padding: 8px 12px;
@@ -236,6 +236,61 @@ header {
     color: var(--main-color);
 }
 
+/* NUEVO: Estilos para el formulario de inicio de sesión */
+.login-form {
+    max-width: 400px;
+    margin: 2rem auto;
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: left; /* Alinea el texto a la izquierda dentro del formulario */
+    color: #333; /* Color de texto para el formulario de login */
+}
+
+.login-form h3 {
+    font-size: 2.2rem;
+    margin-bottom: 1.5rem;
+    color: var(--main-color);
+    text-align: center;
+}
+
+.login-form label {
+    display: block;
+    margin-top: 1rem;
+    font-size: 1.6rem;
+    color: #555;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    font-size: 1.4rem;
+    color: #333;
+}
+
+.login-form button {
+    margin-top: 2rem;
+    background-color: var(--main-color);
+    color: #fff;
+    padding: 1rem 2rem;
+    border: none;
+    font-size: 1.6rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%; /* Botones de login al 100% de ancho */
+}
+
+.login-form button:hover {
+    background-color: #0056b3;
+}
+
+
+/* Estilos para el formulario de reservas existente */
 .Reservas form {
     max-width: 500px;
     margin: 2rem auto;
@@ -260,7 +315,7 @@ header {
     border: 1px solid #ccc;
     border-radius: 0.5rem;
     font-size: 1.4rem;
-    color: #333; /* Asegura que el texto de entrada sea visible */
+    color: #333;
 }
 
 .Reservas button {
@@ -276,12 +331,12 @@ header {
 }
 
 .Reservas button:hover {
-    background-color: #0056b3; /* o un tono más oscuro del color principal */
+    background-color: #0056b3;
 }
 
 /* Responsive para el formulario de reservas */
 @media screen and (max-width: 600px) {
-    .Reservas form {
+    .Reservas form, .login-form { /* Aplicar también al formulario de login */
         padding: 1.5rem;
     }
 

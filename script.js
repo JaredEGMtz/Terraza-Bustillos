@@ -1,6 +1,4 @@
 // Firebase configuration and initialization (MANDATORY)
-// **IMPORTANTE:** Reemplaza los valores de firebaseConfig con los de tu propio proyecto de Firebase.
-// Puedes encontrar esta configuración en la Consola de Firebase -> Configuración del proyecto -> Tus aplicaciones.
 const firebaseConfig = {
     apiKey: "AIzaSyBokVu0scSUp98zAkIaR_wzlOHehro_PKA",
     authDomain: "terraza-bustillos.firebaseapp.com",
@@ -8,89 +6,144 @@ const firebaseConfig = {
     storageBucket: "terraza-bustillos.firebasestorage.app",
     messagingSenderId: "555984411834",
     appId: "1:555984411834:web:94cb62c019a49a374ff683",
-    measurementId: "G-JM6GH3RC16" // measurementId es opcional, pero está bien incluirlo
+    measurementId: "G-JM6GH3RC16"
 };
 
 // El appId se puede extraer directamente de firebaseConfig si lo incluyes allí
-const appId = firebaseConfig.appId; // Usamos el appId de tu configuración real
+const appId = firebaseConfig.appId;
 
-// Firebase imports
+// Firebase imports - ACTUALIZADO A LA VERSIÓN 12.0.0
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js';
-import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js';
+import {
+    getAuth,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+} from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js';
 import { getFirestore, doc, setDoc, deleteDoc, collection, onSnapshot } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
 
 let app, db, auth;
-let userId = null; // Will store the current user's ID
-let isAdmin = false; // Flag to determine if the current user is an admin (for demo purposes)
+let userId = null; // Almacenará el ID del usuario actual
+let isAdmin = false; // Bandera para determinar si el usuario actual es un administrador
+
+// UID del administrador (¡IMPORTANTE: REEMPLAZA ESTO CON EL UID REAL DE TU CUENTA DE ADMINISTRADOR!)
+// Para obtener tu UID:
+// 1. Crea una cuenta con email y contraseña (puedes usar la función de registro temporalmente o en la consola de Firebase).
+// 2. Inicia sesión con esa cuenta.
+// 3. Abre la consola del navegador (F12) y busca el mensaje "User ID: [TU_UID_AQUI]".
+// 4. Pega ese UID aquí.
+const ADMIN_UID = "REEMPLAZA_CON_TU_UID_DE_ADMINISTRADOR_REAL"; // Ejemplo: "abcdef1234567890abcdef1234567890"
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Initialize Firebase
+    // Inicializar Firebase
     try {
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
         auth = getAuth(app);
 
-        // Sign in the user (using custom token if available, otherwise anonymously)
-        // Nota: __initial_auth_token es específico de Canvas. Para Vercel,
-        // necesitarías implementar tu propio sistema de autenticación inicial
-        // o permitir el inicio de sesión anónimo por defecto.
-        // Para este ejemplo, eliminamos la dependencia de __initial_auth_token.
-        await signInAnonymously(auth);
+        // Ya no iniciamos sesión anónimamente por defecto.
+        // La autenticación se manejará a través del formulario de inicio de sesión.
 
     } catch (error) {
-        console.error("Error initializing Firebase or signing in:", error);
-        // Display a user-friendly message in the UI if Firebase fails to initialize
+        console.error("Error al inicializar Firebase:", error);
         const firebaseStatusDiv = document.getElementById('firebaseStatus');
         if (firebaseStatusDiv) {
             firebaseStatusDiv.textContent = 'Error al conectar con Firebase. Algunas funcionalidades podrían no estar disponibles.';
             firebaseStatusDiv.style.color = 'red';
         }
-        return; // Stop execution if Firebase setup fails
+        return;
     }
 
-    // Listen for auth state changes to get the userId and set up Firestore listener
+    // Referencias a elementos de la interfaz de usuario de autenticación
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const loginStatusDiv = document.getElementById('loginStatus');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const adminToggleBtn = document.getElementById('adminToggleBtn'); // Botón de modo admin
+    const userIdDisplay = document.getElementById('userIdDisplay'); // Muestra el ID de usuario
+
+    // Ocultar el botón de modo admin y el estado de usuario al inicio
+    if (adminToggleBtn) adminToggleBtn.style.display = 'none';
+    if (userIdDisplay) userIdDisplay.style.display = 'none';
+    if (logoutBtn) logoutBtn.style.display = 'none';
+
+    // Listener para cambios en el estado de autenticación
     onAuthStateChanged(auth, (user) => {
         if (user) {
             userId = user.uid;
             console.log("User ID:", userId);
-            // Display user ID in the UI
-            const userIdDisplay = document.getElementById('userIdDisplay');
             if (userIdDisplay) {
                 userIdDisplay.textContent = `ID de Usuario: ${userId}`;
+                userIdDisplay.style.display = 'block';
             }
 
-            // For demonstration: A simple way to make a user an admin.
-            // In a real application, you'd manage roles in Firestore or a backend.
-            // Example: If a specific user ID is admin, or if a toggle is active.
-            // For now, let's allow a toggle button to simulate admin access.
-            const adminToggleBtn = document.getElementById('adminToggleBtn');
+            // Verificar si el usuario es administrador
+            isAdmin = (userId === ADMIN_UID);
+            console.log("Modo Admin:", isAdmin);
+
+            // Actualizar el estado del botón de modo admin
             if (adminToggleBtn) {
-                adminToggleBtn.addEventListener('click', () => {
-                    isAdmin = !isAdmin;
-                    adminToggleBtn.textContent = isAdmin ? 'Modo Admin: ON' : 'Modo Admin: OFF';
-                    adminToggleBtn.classList.toggle('bg-green-500', isAdmin);
-                    adminToggleBtn.classList.toggle('bg-gray-500', !isAdmin);
-                    console.log("Admin Mode:", isAdmin);
-                    renderCalendar(); // Re-render to reflect admin view
-                });
+                adminToggleBtn.textContent = isAdmin ? 'Modo Admin: ON' : 'Modo Admin: OFF';
+                adminToggleBtn.classList.toggle('bg-green-500', isAdmin);
+                adminToggleBtn.classList.toggle('bg-gray-500', !isAdmin);
+                adminToggleBtn.style.display = 'block'; // Mostrar el botón de modo admin
             }
 
-            // Setup Firestore listener for unavailable dates
+            if (loginStatusDiv) loginStatusDiv.textContent = `Sesión iniciada como: ${user.email || 'Anónimo'}`;
+            if (loginForm) loginForm.style.display = 'none'; // Ocultar formulario de login
+            if (logoutBtn) logoutBtn.style.display = 'block'; // Mostrar botón de logout
+
+            // Configurar el listener de Firestore solo si hay un usuario autenticado
             setupUnavailableDatesListener();
 
         } else {
             userId = null;
+            isAdmin = false;
             console.log("No user signed in.");
-            const userIdDisplay = document.getElementById('userIdDisplay');
-            if (userIdDisplay) {
-                userIdDisplay.textContent = 'ID de Usuario: No autenticado';
-            }
-            // Clear unavailable dates if no user
+            if (userIdDisplay) userIdDisplay.style.display = 'none';
+            if (adminToggleBtn) adminToggleBtn.style.display = 'none'; // Ocultar botón de modo admin
+            if (loginStatusDiv) loginStatusDiv.textContent = 'No hay sesión iniciada.';
+            if (loginForm) loginForm.style.display = 'block'; // Mostrar formulario de login
+            if (logoutBtn) logoutBtn.style.display = 'none'; // Ocultar botón de logout
+
+            // Limpiar fechas no disponibles si no hay usuario autenticado
             unavailableDatesFirestore = [];
-            renderCalendar();
+            renderCalendar(); // Re-renderizar para reflejar el estado sin fechas de Firestore
         }
     });
 
+    // Manejar el envío del formulario de inicio de sesión
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                console.log("Inicio de sesión exitoso!");
+                // onAuthStateChanged manejará la actualización de la UI
+            } catch (error) {
+                console.error("Error al iniciar sesión:", error.message);
+                if (loginStatusDiv) loginStatusDiv.textContent = `Error al iniciar sesión: ${error.message}`;
+            }
+        });
+    }
+
+    // Manejar el cierre de sesión
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                console.log("Sesión cerrada.");
+                // onAuthStateChanged manejará la actualización de la UI
+            } catch (error) {
+                console.error("Error al cerrar sesión:", error.message);
+            }
+        });
+    }
 
     // --- Lógica de tu menú de navegación existente ---
     const menuIcon = document.querySelector('.menu-icon i');
@@ -115,16 +168,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const nextMonthBtn = document.getElementById('nextMonth');
 
     let currentDate = new Date();
-    let unavailableDatesFirestore = []; // This will store dates from Firestore
+    let unavailableDatesFirestore = []; // Esto almacenará las fechas de Firestore
 
-    // Function to set up real-time listener for unavailable dates
+    // Función para configurar el listener en tiempo real para fechas no disponibles
     function setupUnavailableDatesListener() {
         if (!db || !userId) {
-            console.warn("Firestore not initialized or user not authenticated. Cannot set up listener.");
+            console.warn("Firestore no inicializado o usuario no autenticado. No se puede configurar el listener.");
             return;
         }
 
-        // Collection path for public data: /artifacts/{appId}/public/data/{your_collection_name}
+        // Ruta de la colección para datos públicos: /artifacts/{appId}/public/data/{your_collection_name}
         const unavailableDatesColRef = collection(db, `artifacts/${appId}/public/data/unavailable_dates`);
 
         onSnapshot(unavailableDatesColRef, (snapshot) => {
@@ -136,15 +189,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
             console.log("Fechas no disponibles desde Firestore:", unavailableDatesFirestore);
-            renderCalendar(); // Re-render calendar with updated data
+            renderCalendar(); // Re-renderizar el calendario con datos actualizados
         }, (error) => {
-            console.error("Error getting unavailable dates:", error);
+            console.error("Error al obtener fechas no disponibles:", error);
         });
     }
 
-    // Function to render the calendar
+    // Función para renderizar el calendario
     function renderCalendar() {
-        daysGrid.innerHTML = ''; // Clear previous days
+        daysGrid.innerHTML = ''; // Limpiar días anteriores
 
         monthYearDisplay.textContent = currentDate.toLocaleString('es-ES', {
             month: 'long',
@@ -158,21 +211,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const today = new Date();
         const isCurrentMonth = today.getFullYear() === currentDate.getFullYear() && today.getMonth() === currentDate.getMonth();
 
-        // Add empty cells for days before the first day of the month
+        // Añadir celdas vacías para los días antes del primer día del mes
         for (let i = 0; i < firstDayOfWeek; i++) {
             const emptyDay = document.createElement('div');
             emptyDay.classList.add('day', 'empty');
             daysGrid.appendChild(emptyDay);
         }
 
-        // Add days of the month
+        // Añadir días del mes
         for (let day = 1; day <= daysInMonth; day++) {
             const dayElement = document.createElement('div');
             dayElement.classList.add('day', 'current-month');
             dayElement.textContent = day;
 
             const fullDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-            // Format date as YYYY-MM-DD for consistent comparison with Firestore data
+            // Formatear fecha como YYYY-MM-DD para una comparación consistente con los datos de Firestore
             const formattedDate = fullDate.toISOString().split('T')[0];
 
             const isUnavailable = unavailableDatesFirestore.includes(formattedDate);
@@ -187,26 +240,26 @@ document.addEventListener('DOMContentLoaded', async () => {
                 dayElement.classList.add('available');
             }
 
-            // Store the formatted date as a data attribute for easy access
+            // Almacenar la fecha formateada como un atributo de datos para un fácil acceso
             dayElement.dataset.date = formattedDate;
 
             daysGrid.appendChild(dayElement);
         }
     }
 
-    // Event listener for previous month button
+    // Listener de eventos para el botón de mes anterior
     prevMonthBtn.addEventListener('click', () => {
         currentDate.setMonth(currentDate.getMonth() - 1);
         renderCalendar();
     });
 
-    // Event listener for next month button
+    // Listener de eventos para el botón de mes siguiente
     nextMonthBtn.addEventListener('click', () => {
         currentDate.setMonth(currentDate.getMonth() + 1);
         renderCalendar();
     });
 
-    // Initial render of the calendar (will be re-rendered by onSnapshot later)
+    // Renderizado inicial del calendario (será re-renderizado por onSnapshot más tarde)
     renderCalendar();
 
 
@@ -222,12 +275,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        const selectedDateString = clickedDay.dataset.date; // Get the YYYY-MM-DD date string
+        const selectedDateString = clickedDay.dataset.date;
         const isCurrentlyUnavailable = clickedDay.classList.contains('unavailable');
 
-        if (isAdmin && userId) { // Only if admin mode is ON and user is authenticated
+        // Lógica de edición solo si es administrador
+        if (isAdmin && userId) {
             if (isCurrentlyUnavailable) {
-                // Mark as available (delete from Firestore)
+                // Marcar como disponible (eliminar de Firestore)
                 try {
                     const docRef = doc(db, `artifacts/${appId}/public/data/unavailable_dates`, selectedDateString);
                     await deleteDoc(docRef);
@@ -236,7 +290,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     console.error("Error al marcar fecha como disponible:", e);
                 }
             } else {
-                // Mark as unavailable (add to Firestore)
+                // Marcar como no disponible (añadir a Firestore)
                 try {
                     const docRef = doc(db, `artifacts/${appId}/public/data/unavailable_dates`, selectedDateString);
                     await setDoc(docRef, { date: selectedDateString, unavailableBy: userId });
@@ -245,14 +299,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     console.error("Error al marcar fecha como no disponible:", e);
                 }
             }
-            // No need to manually re-render, onSnapshot will handle it
-            formularioReservas.style.display = 'none'; // Hide form after admin action
-        } else { // Regular user or admin mode OFF
+            // No es necesario re-renderizar manualmente, onSnapshot lo manejará
+            formularioReservas.style.display = 'none'; // Ocultar formulario después de la acción de administrador
+        } else { // Usuario regular o modo admin DESACTIVADO
             if (isCurrentlyUnavailable) {
                 console.log('Esta fecha no está disponible para reservas.');
                 formularioReservas.style.display = 'none';
             } else {
-                // Regular user: select the date and show the form
+                // Usuario regular: seleccionar la fecha y mostrar el formulario
                 document.querySelectorAll('.day.selected').forEach(day => day.classList.remove('selected'));
                 clickedDay.classList.add('selected');
 
@@ -266,7 +320,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Opcional: Si el usuario cambia la fecha en el input nativo, actualizar el calendario
     fechaPrincipalInput.addEventListener('change', () => {
         const selectedDate = new Date(fechaPrincipalInput.value);
-        if (!isNaN(selectedDate.getTime())) { // Check if date is valid
+        if (!isNaN(selectedDate.getTime())) { // Verificar si la fecha es válida
             currentDate = selectedDate;
             renderCalendar();
             formularioReservas.style.display = 'block'; // Mostrar formulario al seleccionar desde el input
