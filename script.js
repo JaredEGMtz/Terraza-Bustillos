@@ -33,7 +33,7 @@ let isAdmin = false; // Bandera para determinar si el usuario actual es un admin
 // 2. Inicia sesión con esa cuenta.
 // 3. Abre la consola del navegador (F12) y busca el mensaje "User ID: [TU_UID_AQUI]".
 // 4. Pega ese UID aquí.
-const ADMIN_UID = "REEMPLAZA_CON_TU_UID_DE_ADMINISTRADOR_REAL"; // Ejemplo: "abcdef1234567890abcdef1234567890"
+const ADMIN_UID = "Zj4oJLAsW0SFoPhR0Sca0aq1HUQ2"; // Ejemplo: "abcdef1234567890abcdef1234567890"
 
 document.addEventListener('DOMContentLoaded', async () => {
     // Inicializar Firebase
